@@ -36,6 +36,7 @@ const useStyles = makeStyles()((theme) => ({
     display: 'block',
     mixBlendMode: 'lighten',
     transition: 'opacity .25s',
+    pointerEvents: 'none',
   },
   poster: {
     position: 'absolute',
@@ -153,6 +154,10 @@ const LoginLayout = ({ children }) => {
             muted
             playsInline
             preload="auto"
+            disablePictureInPicture
+            disableRemotePlayback
+            controls={false}
+            tabIndex={-1}
           />
         </div>
         <div className={classes.brandText}>
