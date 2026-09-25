@@ -159,7 +159,15 @@ const useStyles = makeStyles()((theme, { desktopPadding }) => ({
   },
 }));
 
-const StatusCard = ({ deviceId, position, onClose, onEdit, disableActions, desktopPadding = 0 }) => {
+const StatusCard = ({
+  deviceId,
+  position,
+  onClose,
+  onEdit,
+  onCommand,
+  disableActions,
+  desktopPadding = 0,
+}) => {
   const { classes, cx } = useStyles({ desktopPadding });
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -309,7 +317,8 @@ const StatusCard = ({ deviceId, position, onClose, onEdit, disableActions, deskt
                 </Tooltip>
                 <Tooltip title={t('commandTitle')}>
                   <IconButton
-                    onClick={() => navigate(`/settings/device/${deviceId}/command`)}
+                    onClick={() =>
+                      onCommand ? onCommand(deviceId) : navigate(`/settings/device/${deviceId}/command`)}
                     disabled={disableActions}
                   >
                     <SendIcon />

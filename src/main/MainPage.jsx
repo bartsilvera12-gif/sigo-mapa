@@ -13,6 +13,7 @@ import EventsDrawer from './EventsDrawer';
 import useFilter from './useFilter';
 import MainToolbar from './MainToolbar';
 import DeviceDialog from './DeviceDialog';
+import CommandDialog from './CommandDialog';
 import { useAttributePreference } from '../common/util/preferences';
 
 const MainMap = lazy(() => import('./MainMap'));
@@ -95,6 +96,7 @@ const MainPage = () => {
   const [devicesOpen, setDevicesOpen] = useState(desktop);
   const [eventsOpen, setEventsOpen] = useState(false);
   const [editDeviceId, setEditDeviceId] = useState(null);
+  const [commandDeviceId, setCommandDeviceId] = useState(null);
 
   const onEventsClick = useCallback(() => setEventsOpen(true), [setEventsOpen]);
 
@@ -174,6 +176,7 @@ const MainPage = () => {
           position={selectedPosition}
           onClose={() => dispatch(devicesActions.selectId(null))}
           onEdit={(id) => setEditDeviceId(id)}
+          onCommand={(id) => setCommandDeviceId(id)}
           desktopPadding={theme.dimensions.drawerWidthDesktop}
         />
       )}
@@ -181,6 +184,11 @@ const MainPage = () => {
         open={Boolean(editDeviceId)}
         deviceId={editDeviceId}
         onClose={() => setEditDeviceId(null)}
+      />
+      <CommandDialog
+        open={Boolean(commandDeviceId)}
+        deviceId={commandDeviceId}
+        onClose={() => setCommandDeviceId(null)}
       />
     </div>
   );
