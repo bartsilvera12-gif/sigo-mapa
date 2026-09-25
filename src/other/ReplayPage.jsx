@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { IconButton, Paper, Slider, Toolbar, Typography } from '@mui/material';
+import { IconButton, Paper, Slider, Typography } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 import TuneIcon from '@mui/icons-material/Tune';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -43,8 +43,33 @@ const useStyles = makeStyles()((theme) => ({
       margin: 0,
     },
   },
+  card: {
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
+    [theme.breakpoints.down('md')]: {
+      borderRadius: 0,
+    },
+  },
+  header: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: theme.spacing(1, 1, 1, 2),
+    borderBottom: `1px solid ${theme.palette.divider}`,
+  },
   title: {
     flexGrow: 1,
+    fontWeight: 700,
+    fontSize: '1rem',
+  },
+  stats: {
+    display: 'flex',
+    justifyContent: 'center',
+    gap: theme.spacing(0.5),
+    fontSize: '0.75rem',
+    color: theme.palette.text.secondary,
+    fontVariantNumeric: 'tabular-nums',
+    marginBottom: theme.spacing(1),
   },
   slider: {
     width: '100%',
@@ -65,12 +90,6 @@ const useStyles = makeStyles()((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     padding: theme.spacing(2),
-    [theme.breakpoints.down('md')]: {
-      margin: theme.spacing(1),
-    },
-    [theme.breakpoints.up('md')]: {
-      marginTop: theme.spacing(1),
-    },
   },
 }));
 
@@ -190,12 +209,12 @@ const ReplayPage = () => {
       <MapScale />
       <MapCamera positions={positions} />
       <div className={classes.sidebar}>
-        <Paper elevation={3} square>
-          <Toolbar>
-            <IconButton edge="start" sx={{ mr: 2 }} onClick={() => navigate(-1)}>
+        <Paper elevation={3} className={classes.card}>
+          <div className={classes.header}>
+            <IconButton edge="start" sx={{ mr: 1 }} onClick={() => navigate(-1)}>
               <BackIcon />
             </IconButton>
-            <Typography variant="h6" className={classes.title}>
+            <Typography className={classes.title}>
               {t('reportReplay')}
             </Typography>
             {loaded && (
@@ -208,14 +227,20 @@ const ReplayPage = () => {
                 </IconButton>
               </>
             )}
-          </Toolbar>
-        </Paper>
-        <Paper className={classes.content} square>
+          </div>
+          <div className={classes.content}>
           {loaded && !filterOpen && (
             <>
-              <Typography variant="subtitle1" align="center">
+              <Typography variant="subtitle1" align="center" sx={{ fontWeight: 600 }}>
                 {deviceName}
               </Typography>
+              <div className={classes.stats}>
+                <span>{`${positions.length} pts`}</span>
+                <span>·</span>
+                <span>
+                  {`${formatTime(positions[0].fixTime, 'time')} – ${formatTime(positions[positions.length - 1].fixTime, 'time')}`}
+                </span>
+              </div>
               <Slider
                 className={classes.slider}
                 max={positions.length - 1}
@@ -252,6 +277,7 @@ const ReplayPage = () => {
           )}
           <div style={{ display: loaded && !filterOpen ? 'none' : 'block' }}>
             <ReportFilter onShow={onShow} deviceType="single" loading={loading} />
+          </div>
           </div>
         </Paper>
       </div>
