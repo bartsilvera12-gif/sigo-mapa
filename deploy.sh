@@ -8,7 +8,7 @@
 set -euo pipefail
 
 # --- Configuracion (ajustar si tu instalacion es distinta) ---
-BRANCH="claude/gifted-maxwell-g54or1"   # rama de trabajo
+BRANCH="main"                          # rama de trabajo
 WEB_DIR="/opt/traccar/web"              # carpeta que sirve Traccar
 # -------------------------------------------------------------
 

@@ -4,7 +4,7 @@ import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&ur
 import { googleProtocol } from 'maplibre-google-maps';
 import { Protocol } from 'pmtiles';
 import { useRef, useLayoutEffect, useEffect, useState, useMemo } from 'react';
-import { useTheme } from '@mui/material';
+import { useTheme, GlobalStyles } from '@mui/material';
 import MapSwitcher from '../control/MapSwitcher';
 import { useAttributePreference, usePreference } from '../../common/util/preferences';
 import usePersistedState from '../../common/util/usePersistedState';
@@ -148,6 +148,24 @@ const MapView = ({ children }) => {
 
   return (
     <div style={{ width: '100%', height: '100%' }} ref={containerRef}>
+      <GlobalStyles
+        styles={{
+          // Controles del mapa (MapLibre) con estilo SIGO: bordes redondeados y sombra.
+          // Se mantiene el fondo por defecto para que los iconos sigan visibles en ambos modos.
+          '.maplibregl-ctrl-group': {
+            borderRadius: '11px !important',
+            overflow: 'hidden',
+            boxShadow: '0 8px 22px rgba(12,18,32,.28) !important',
+          },
+          '.maplibregl-ctrl-group button': {
+            width: '38px',
+            height: '38px',
+          },
+          '.maplibregl-ctrl button:not(:disabled):hover': {
+            backgroundColor: `${theme.palette.primary.main}14 !important`,
+          },
+        }}
+      />
       <MapSwitcher styles={styles} selectedId={selectedStyleId} onSelect={setSelectedStyleId} />
       {mapReady && children}
     </div>

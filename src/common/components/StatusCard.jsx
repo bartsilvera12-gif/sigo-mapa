@@ -37,6 +37,18 @@ import { useCatch, useCatchCallback } from '../../reactHelper';
 import { useAttributePreference } from '../util/preferences';
 import fetchOrThrow from '../util/fetchOrThrow';
 
+// SIGO status: marcha (verde) / quieto (amarillo) / noreporta (rojo) / nunca (gris)
+const sigoStatus = (device, position) => {
+  if (device?.status === 'online') {
+    const moving = position?.attributes?.motion ?? (position?.speed > 0);
+    return moving ? 'moving' : 'idle';
+  }
+  if (device?.status === 'offline') {
+    return 'offline';
+  }
+  return 'never';
+};
+
 const useStyles = makeStyles()((theme, { desktopPadding }) => ({
   card: {
     pointerEvents: 'auto',
@@ -44,11 +56,38 @@ const useStyles = makeStyles()((theme, { desktopPadding }) => ({
   },
   header: {
     display: 'flex',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: theme.spacing(1, 1, 0, 2),
-    color: theme.palette.text.secondary,
+    gap: theme.spacing(1),
+    padding: theme.spacing(1.25, 1, 1.25, 2),
+    borderBottom: `1px solid ${theme.palette.divider}`,
   },
+  pin: {
+    flex: 'none',
+    width: 13,
+    height: 13,
+    borderRadius: '50% 50% 50% 0',
+    transform: 'rotate(-45deg)',
+    backgroundColor: theme.palette.primary.main,
+  },
+  title: {
+    flex: 1,
+    minWidth: 0,
+    fontWeight: 600,
+    fontSize: '0.9rem',
+  },
+  dot: {
+    flex: 'none',
+    width: 10,
+    height: 10,
+    borderRadius: '50%',
+  },
+  moving: { backgroundColor: theme.palette.status.moving },
+  idle: { backgroundColor: theme.palette.status.idle },
+  offline: {
+    backgroundColor: theme.palette.status.offline,
+    boxShadow: `0 0 0 3px ${theme.palette.status.offline}47`,
+  },
+  never: { backgroundColor: theme.palette.status.never },
   media: {
     height: theme.dimensions.popupImageHeight,
     '& > div': {
@@ -62,11 +101,6 @@ const useStyles = makeStyles()((theme, { desktopPadding }) => ({
     maxHeight: theme.dimensions.cardContentMaxHeight,
     overflow: 'auto',
   },
-  icon: {
-    width: '25px',
-    height: '25px',
-    filter: 'brightness(0) invert(1)',
-  },
   table: {
     '& .MuiTableCell-sizeSmall': {
       paddingLeft: 0,
@@ -77,7 +111,7 @@ const useStyles = makeStyles()((theme, { desktopPadding }) => ({
     },
   },
   cell: {
-    borderBottom: 'none',
+    borderBottom: `1px solid ${theme.palette.divider}`,
   },
   actions: {
     justifyContent: 'space-between',
@@ -105,10 +139,10 @@ const StatusRow = ({ name, content }) => {
   return (
     <TableRow>
       <TableCell className={classes.cell}>
-        <Typography variant="body2">{name}</Typography>
+        <Typography variant="body2" color="textSecondary">{name}</Typography>
       </TableCell>
-      <TableCell className={classes.cell}>
-        <Typography variant="body2" color="textSecondary">
+      <TableCell className={classes.cell} align="right">
+        <Typography variant="body2">
           {content}
         </Typography>
       </TableCell>
@@ -117,7 +151,7 @@ const StatusRow = ({ name, content }) => {
 };
 
 const StatusCard = ({ deviceId, position, onClose, disableActions, desktopPadding = 0 }) => {
-  const { classes } = useStyles({ desktopPadding });
+  const { classes, cx } = useStyles({ desktopPadding });
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const t = useTranslation();
@@ -171,6 +205,8 @@ const StatusCard = ({ deviceId, position, onClose, disableActions, desktopPaddin
     navigate(`/settings/geofence/${item.id}`);
   }, [navigate, position, t]);
 
+  const status = sigoStatus(device, position);
+
   return (
     <>
       <div className={classes.root}>
@@ -182,19 +218,25 @@ const StatusCard = ({ deviceId, position, onClose, disableActions, desktopPaddin
             style={{ position: 'relative' }}
           >
             <Card elevation={3} className={classes.card}>
-              <CardMedia
-                className={`draggable-header ${deviceImage ? classes.media : ''}`}
-                image={deviceImage && `/api/media/${device.uniqueId}/${deviceImage}`}
-              >
-                <div className={classes.header}>
-                  <Typography variant="body2" color="inherit">
-                    {device.name}
-                  </Typography>
-                  <IconButton size="small" color="inherit" onClick={onClose} onTouchStart={onClose}>
-                    <CloseIcon fontSize="small" />
-                  </IconButton>
-                </div>
-              </CardMedia>
+              {deviceImage ? (
+                <CardMedia
+                  className={`draggable-header ${classes.media}`}
+                  image={`/api/media/${device.uniqueId}/${deviceImage}`}
+                />
+              ) : null}
+              <div className={`draggable-header ${classes.header}`}>
+                <span className={classes.pin} />
+                <Typography noWrap className={classes.title}>
+                  {device.name}
+                  {device.uniqueId ? ` · ${device.uniqueId}` : ''}
+                </Typography>
+                <Tooltip title={t(`deviceStatus${device.status.charAt(0).toUpperCase()}${device.status.slice(1)}`)}>
+                  <span className={cx(classes.dot, classes[status])} />
+                </Tooltip>
+                <IconButton size="small" onClick={onClose} onTouchStart={onClose}>
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </div>
               {position && (
                 <CardContent className={classes.content}>
                   <Table size="small" className={classes.table}>
@@ -221,7 +263,7 @@ const StatusCard = ({ deviceId, position, onClose, disableActions, desktopPaddin
                     </TableBody>
                     <TableFooter>
                       <TableRow>
-                        <TableCell colSpan={2} className={classes.cell}>
+                        <TableCell colSpan={2} className={classes.cell} style={{ borderBottom: 'none' }}>
                           <Typography variant="body2">
                             <Link component={RouterLink} to={`/position/${position.id}`}>
                               {t('sharedShowDetails')}

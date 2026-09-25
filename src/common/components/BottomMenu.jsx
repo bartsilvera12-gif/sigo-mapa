@@ -127,7 +127,32 @@ const BottomMenu = () => {
 
   return (
     <Paper elevation={0}>
-      <BottomNavigation value={currentSelection()} onChange={handleSelection} showLabels>
+      <Typography
+        sx={{
+          textAlign: 'center',
+          fontFamily: '"Playfair Display", Georgia, serif',
+          fontStyle: 'italic',
+          fontSize: '0.85rem',
+          color: 'text.secondary',
+          py: 1,
+          borderTop: 1,
+          borderColor: 'divider',
+        }}
+      >
+        Donde esté, lo sabés.
+      </Typography>
+      <BottomNavigation
+        value={currentSelection()}
+        onChange={handleSelection}
+        showLabels
+        sx={{
+          borderTop: 1,
+          borderColor: 'divider',
+          '& .MuiBottomNavigationAction-root.Mui-selected': {
+            boxShadow: (theme) => `inset 0 2px 0 ${theme.palette.primary.main}`,
+          },
+        }}
+      >
         <BottomNavigationAction
           label={t('mapTitle')}
           icon={

@@ -4,7 +4,7 @@ Este repo tiene el frontend de Traccar (`traccar-web`) personalizado para SIGO.
 
 ## Cómo funciona
 
-1. **Claude edita el código** en la rama `claude/gifted-maxwell-g54or1` y lo sube a GitHub.
+1. **Claude edita el código** en la rama `main` y lo sube a GitHub.
 2. **Vos, en el servidor**, corrés un solo comando y se despliega todo.
 
 ## Configuración inicial (una sola vez, en el servidor)
@@ -12,7 +12,8 @@ Este repo tiene el frontend de Traccar (`traccar-web`) personalizado para SIGO.
 ```bash
 cd ~/traccar-web
 git fetch origin
-git checkout claude/gifted-maxwell-g54or1
+git checkout main
+git pull origin main
 chmod +x deploy.sh
 ```
 
@@ -43,5 +44,5 @@ sudo cp -r /opt/traccar/web.bak.FECHA/* /opt/traccar/web/
 ## Ajustes del script
 
 Si tu instalación usa otra carpeta, editá las variables arriba de `deploy.sh`:
-- `BRANCH` — rama de trabajo (por defecto `claude/gifted-maxwell-g54or1`).
+- `BRANCH` — rama de trabajo (por defecto `main`).
 - `WEB_DIR` — carpeta que sirve Traccar (por defecto `/opt/traccar/web`).
