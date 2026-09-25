@@ -12,6 +12,7 @@ import usePersistedState from '../common/util/usePersistedState';
 import EventsDrawer from './EventsDrawer';
 import useFilter from './useFilter';
 import MainToolbar from './MainToolbar';
+import DeviceDialog from './DeviceDialog';
 import { useAttributePreference } from '../common/util/preferences';
 
 const MainMap = lazy(() => import('./MainMap'));
@@ -93,6 +94,7 @@ const MainPage = () => {
 
   const [devicesOpen, setDevicesOpen] = useState(desktop);
   const [eventsOpen, setEventsOpen] = useState(false);
+  const [editDeviceId, setEditDeviceId] = useState(null);
 
   const onEventsClick = useCallback(() => setEventsOpen(true), [setEventsOpen]);
 
@@ -171,9 +173,15 @@ const MainPage = () => {
           deviceId={selectedDeviceId}
           position={selectedPosition}
           onClose={() => dispatch(devicesActions.selectId(null))}
+          onEdit={(id) => setEditDeviceId(id)}
           desktopPadding={theme.dimensions.drawerWidthDesktop}
         />
       )}
+      <DeviceDialog
+        open={Boolean(editDeviceId)}
+        deviceId={editDeviceId}
+        onClose={() => setEditDeviceId(null)}
+      />
     </div>
   );
 };

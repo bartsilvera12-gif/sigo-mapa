@@ -28,7 +28,7 @@ import TuneIcon from '@mui/icons-material/Tune';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useDeviceReadonly } from '../common/util/permissions';
 import DeviceRow from './DeviceRow';
-import AddDeviceDialog from './AddDeviceDialog';
+import DeviceDialog from './DeviceDialog';
 
 const useStyles = makeStyles()((theme) => ({
   toolbar: {
@@ -227,7 +227,7 @@ const MainToolbar = ({
         </Tooltip>
       </IconButton>
     </Toolbar>
-      <AddDeviceDialog open={addDeviceOpen} onClose={() => setAddDeviceOpen(false)} />
+      <DeviceDialog open={addDeviceOpen} onClose={() => setAddDeviceOpen(false)} />
     </>
   );
 };
