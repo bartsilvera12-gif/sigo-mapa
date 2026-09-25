@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { IconButton, Paper, Slider, Typography } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 import TuneIcon from '@mui/icons-material/Tune';
+import TableRowsIcon from '@mui/icons-material/TableRows';
 import DownloadIcon from '@mui/icons-material/Download';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
@@ -24,6 +25,7 @@ import MapScale from '../map/MapScale';
 import BackIcon from '../common/components/BackIcon';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import MapOverlay from '../map/overlay/MapOverlay';
+import RouteDetails from './RouteDetails';
 
 const useStyles = makeStyles()((theme) => ({
   root: {
@@ -112,6 +114,7 @@ const ReplayPage = () => {
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
   const loaded = Boolean(from && to && !loading && positions.length);
 
@@ -219,6 +222,12 @@ const ReplayPage = () => {
             </Typography>
             {loaded && (
               <>
+                <IconButton
+                  color={showDetails ? 'primary' : 'default'}
+                  onClick={() => setShowDetails((open) => !open)}
+                >
+                  <TableRowsIcon />
+                </IconButton>
                 <IconButton onClick={handleDownload}>
                   <DownloadIcon />
                 </IconButton>
@@ -287,6 +296,15 @@ const ReplayPage = () => {
           position={positions[index]}
           onClose={() => setShowCard(false)}
           disableActions
+        />
+      )}
+      {loaded && showDetails && (
+        <RouteDetails
+          positions={positions}
+          deviceId={selectedDeviceId}
+          from={from}
+          to={to}
+          onClose={() => setShowDetails(false)}
         />
       )}
     </div>
