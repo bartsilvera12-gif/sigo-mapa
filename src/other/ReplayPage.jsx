@@ -1,5 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { IconButton, Paper, Slider, Typography } from '@mui/material';
+import {
+  IconButton,
+  Paper,
+  Slider,
+  Typography,
+  Button,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 import TuneIcon from '@mui/icons-material/Tune';
 import TableRowsIcon from '@mui/icons-material/TableRows';
@@ -15,7 +26,7 @@ import MapRoutePath from '../map/MapRoutePath';
 import MapRoutePoints from '../map/MapRoutePoints';
 import MapPositionMarkers from '../map/MapPositionMarkers';
 import { formatTime } from '../common/util/formatter';
-import ReportFilter from '../reports/components/ReportFilter';
+import DateRangePicker from './DateRangePicker';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useCatchCallback } from '../reactHelper';
 import MapCamera from '../map/MapCamera';
@@ -101,9 +112,10 @@ const ReplayPage = () => {
   const navigate = useNavigate();
   const timerRef = useRef();
 
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const defaultDeviceId = useSelector((state) => state.devices.selectedId);
+  const devices = useSelector((state) => state.devices.items);
 
   const [positions, setPositions] = useState([]);
   const [index, setIndex] = useState(0);
@@ -115,6 +127,11 @@ const ReplayPage = () => {
   const [loading, setLoading] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+
+  const [filterDeviceId, setFilterDeviceId] = useState(defaultDeviceId || '');
+  const [rangeFrom, setRangeFrom] = useState(null);
+  const [rangeTo, setRangeTo] = useState(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const loaded = Boolean(from && to && !loading && positions.length);
 
@@ -192,6 +209,21 @@ const ReplayPage = () => {
   const handleDownload = () => {
     const query = new URLSearchParams({ deviceId: selectedDeviceId, from, to });
     window.location.assign(`/api/positions/kml?${query.toString()}`);
+  };
+
+  const rangeLabel =
+    rangeFrom && rangeTo
+      ? `${formatTime(rangeFrom, 'minutes')} — ${formatTime(rangeTo, 'minutes')}`
+      : 'Elegí un rango de fechas';
+
+  const handleFilterShow = () => {
+    if (!filterDeviceId || !rangeFrom || !rangeTo) {
+      return;
+    }
+    const fromIso = rangeFrom.toISOString();
+    const toIso = rangeTo.toISOString();
+    setSearchParams({ deviceId: filterDeviceId, from: fromIso, to: toIso });
+    onShow({ deviceIds: [filterDeviceId], from: fromIso, to: toIso });
   };
 
   return (
@@ -284,12 +316,56 @@ const ReplayPage = () => {
               </div>
             </>
           )}
-          <div style={{ display: loaded && !filterOpen ? 'none' : 'block' }}>
-            <ReportFilter onShow={onShow} deviceType="single" loading={loading} />
+          <div
+            style={{
+              display: loaded && !filterOpen ? 'none' : 'flex',
+              flexDirection: 'column',
+              gap: 16,
+            }}
+          >
+            <FormControl fullWidth size="small">
+              <InputLabel>{t('reportDevice')}</InputLabel>
+              <Select
+                label={t('reportDevice')}
+                value={filterDeviceId}
+                onChange={(e) => setFilterDeviceId(e.target.value)}
+              >
+                {Object.values(devices).map((device) => (
+                  <MenuItem key={device.id} value={device.id}>
+                    {device.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <TextField
+              label={t('reportFrom')}
+              value={rangeLabel}
+              onClick={() => setPickerOpen(true)}
+              slotProps={{ input: { readOnly: true } }}
+              sx={{ cursor: 'pointer' }}
+            />
+            <Button
+              variant="contained"
+              onClick={handleFilterShow}
+              disabled={loading || !filterDeviceId || !rangeFrom || !rangeTo}
+            >
+              {t('reportShow')}
+            </Button>
           </div>
           </div>
         </Paper>
       </div>
+      <DateRangePicker
+        open={pickerOpen}
+        initialFrom={rangeFrom}
+        initialTo={rangeTo}
+        onClose={() => setPickerOpen(false)}
+        onApply={(newFrom, newTo) => {
+          setRangeFrom(newFrom);
+          setRangeTo(newTo);
+          setPickerOpen(false);
+        }}
+      />
       {showCard && index < positions.length && (
         <StatusCard
           deviceId={selectedDeviceId}
