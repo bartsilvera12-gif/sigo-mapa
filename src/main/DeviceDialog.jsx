@@ -18,15 +18,17 @@ import {
 import { makeStyles } from 'tss-react/mui';
 import CloseIcon from '@mui/icons-material/Close';
 import PeopleIcon from '@mui/icons-material/People';
-import PlaceIcon from '@mui/icons-material/Place';
-import TuneIcon from '@mui/icons-material/Tune';
 import BuildIcon from '@mui/icons-material/Build';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useCatch } from '../reactHelper';
 import { devicesActions } from '../store';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import SelectField from '../common/components/SelectField';
+import LinkField from '../common/components/LinkField';
 import deviceCategories from '../common/util/deviceCategories';
+import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
+import useDeviceAttributes from '../common/attributes/useDeviceAttributes';
+import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttributes';
 
 const useStyles = makeStyles()((theme) => ({
   header: {
@@ -109,6 +111,9 @@ const DeviceDialog = ({ open, onClose, deviceId }) => {
   const t = useTranslation();
 
   const storedDevice = useSelector((state) => (deviceId ? state.devices.items[deviceId] : null));
+
+  const commonDeviceAttributes = useCommonDeviceAttributes(t);
+  const deviceAttributes = useDeviceAttributes(t);
 
   const [item, setItem] = useState({});
   const [tab, setTab] = useState(0);
@@ -224,17 +229,6 @@ const DeviceDialog = ({ open, onClose, deviceId }) => {
               onChange={(e) => setItem({ ...item, contact: e.target.value })}
             />
             <SelectField
-              value={item.category || 'default'}
-              onChange={(e) => setItem({ ...item, category: e.target.value })}
-              data={deviceCategories
-                .map((category) => ({
-                  id: category,
-                  name: t(`category${category.replace(/^\w/, (c) => c.toUpperCase())}`),
-                }))
-                .sort((a, b) => a.name.localeCompare(b.name))}
-              label={t('deviceCategory')}
-            />
-            <SelectField
               value={item.groupId}
               onChange={(e) => setItem({ ...item, groupId: Number(e.target.value) })}
               endpoint="/api/groups"
@@ -250,25 +244,68 @@ const DeviceDialog = ({ open, onClose, deviceId }) => {
           </div>
         )}
         {tab === 1 && (
-          <EmptyTab
-            icon={<PeopleIcon fontSize="inherit" />}
-            text="Gestioná qué usuarios ven este dispositivo desde los ajustes completos."
-            {...otherTabAction}
-          />
+          editing ? (
+            <div className={classes.content}>
+              <LinkField
+                endpointAll="/api/users"
+                endpointLinked={`/api/users?deviceId=${deviceId}`}
+                baseId={deviceId}
+                keyBase="deviceId"
+                keyLink="userId"
+                label="Usuarios con acceso"
+              />
+            </div>
+          ) : (
+            <EmptyTab
+              icon={<PeopleIcon fontSize="inherit" />}
+              text="Guardá el dispositivo primero para asignar qué usuarios lo ven."
+            />
+          )
         )}
         {tab === 2 && (
-          <EmptyTab
-            icon={<PlaceIcon fontSize="inherit" />}
-            text="El ícono y el color del estado se configuran en los ajustes completos."
-            {...otherTabAction}
-          />
+          <div className={classes.content}>
+            <SelectField
+              value={item.category || 'default'}
+              onChange={(e) => setItem({ ...item, category: e.target.value })}
+              data={deviceCategories
+                .map((category) => ({
+                  id: category,
+                  name: t(`category${category.replace(/^\w/, (c) => c.toUpperCase())}`),
+                }))
+                .sort((a, b) => a.name.localeCompare(b.name))}
+              label="Icono en el mapa"
+            />
+            <Typography variant="caption" color="textSecondary">
+              El color del marcador es automático según el estado (verde en marcha,
+              amarillo detenido, rojo sin reportar, gris nunca reportó).
+            </Typography>
+          </div>
         )}
         {tab === 3 && (
-          <EmptyTab
-            icon={<TuneIcon fontSize="inherit" />}
-            text="Opciones avanzadas y sensores disponibles en los ajustes completos."
-            {...otherTabAction}
-          />
+          <div className={classes.content}>
+            <EditAttributesAccordion
+              attributes={attributes}
+              setAttributes={(next) => setItem({ ...item, attributes: next })}
+              definitions={{ ...commonDeviceAttributes, ...deviceAttributes }}
+            />
+            <Typography variant="overline" color="textSecondary">
+              Sensores
+            </Typography>
+            {editing ? (
+              <LinkField
+                endpointAll="/api/attributes/computed"
+                endpointLinked={`/api/attributes/computed?deviceId=${deviceId}`}
+                baseId={deviceId}
+                keyBase="deviceId"
+                keyLink="attributeId"
+                label="Sensores / atributos computados"
+              />
+            ) : (
+              <Typography variant="body2" color="textSecondary">
+                Guardá el dispositivo primero para asignar sensores.
+              </Typography>
+            )}
+          </div>
         )}
         {tab === 4 && (
           <EmptyTab
