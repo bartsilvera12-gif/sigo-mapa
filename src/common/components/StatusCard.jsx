@@ -8,14 +8,9 @@ import {
   Typography,
   CardActions,
   IconButton,
-  Table,
-  TableBody,
-  TableRow,
-  TableCell,
   Menu,
   MenuItem,
   CardMedia,
-  TableFooter,
   Link,
   Tooltip,
 } from '@mui/material';
@@ -101,17 +96,48 @@ const useStyles = makeStyles()((theme, { desktopPadding }) => ({
     maxHeight: theme.dimensions.cardContentMaxHeight,
     overflow: 'auto',
   },
-  table: {
-    '& .MuiTableCell-sizeSmall': {
-      paddingLeft: 0,
-      paddingRight: 0,
-    },
-    '& .MuiTableCell-sizeSmall:first-of-type': {
-      paddingRight: theme.spacing(1),
+  eyebrow: {
+    fontSize: '0.62rem',
+    fontWeight: 600,
+    letterSpacing: '.12em',
+    textTransform: 'uppercase',
+    color: theme.palette.text.secondary,
+    margin: theme.spacing(1.25, 0, 0.25),
+  },
+  address: {
+    fontSize: '0.8125rem',
+    paddingBottom: theme.spacing(1),
+    borderBottom: `1px solid ${theme.palette.divider}`,
+  },
+  kvGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+    columnGap: theme.spacing(2.5),
+    [theme.breakpoints.down('sm')]: {
+      gridTemplateColumns: 'minmax(0, 1fr)',
     },
   },
-  cell: {
+  kvRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    gap: theme.spacing(1),
+    padding: theme.spacing(0.75, 0),
     borderBottom: `1px solid ${theme.palette.divider}`,
+    fontSize: '0.78rem',
+  },
+  kvLabel: {
+    color: theme.palette.text.secondary,
+    whiteSpace: 'nowrap',
+  },
+  kvValue: {
+    fontWeight: 500,
+    textAlign: 'right',
+    overflowWrap: 'anywhere',
+  },
+  details: {
+    marginTop: theme.spacing(1.25),
+    display: 'block',
   },
   actions: {
     justifyContent: 'space-between',
@@ -132,23 +158,6 @@ const useStyles = makeStyles()((theme, { desktopPadding }) => ({
     transform: 'translateX(-50%)',
   },
 }));
-
-const StatusRow = ({ name, content }) => {
-  const { classes } = useStyles({ desktopPadding: 0 });
-
-  return (
-    <TableRow>
-      <TableCell className={classes.cell}>
-        <Typography variant="body2" color="textSecondary">{name}</Typography>
-      </TableCell>
-      <TableCell className={classes.cell} align="right">
-        <Typography variant="body2">
-          {content}
-        </Typography>
-      </TableCell>
-    </TableRow>
-  );
-};
 
 const StatusCard = ({ deviceId, position, onClose, disableActions, desktopPadding = 0 }) => {
   const { classes, cx } = useStyles({ desktopPadding });
@@ -239,40 +248,45 @@ const StatusCard = ({ deviceId, position, onClose, disableActions, desktopPaddin
               </div>
               {position && (
                 <CardContent className={classes.content}>
-                  <Table size="small" className={classes.table}>
-                    <TableBody>
-                      {positionItems
-                        .split(',')
-                        .filter(
-                          (key) =>
-                            position.hasOwnProperty(key) || position.attributes.hasOwnProperty(key),
-                        )
-                        .map((key) => (
-                          <StatusRow
-                            key={key}
-                            name={positionAttributes[key]?.name || key}
-                            content={
-                              <PositionValue
-                                position={position}
-                                property={position.hasOwnProperty(key) ? key : null}
-                                attribute={position.hasOwnProperty(key) ? null : key}
-                              />
-                            }
-                          />
-                        ))}
-                    </TableBody>
-                    <TableFooter>
-                      <TableRow>
-                        <TableCell colSpan={2} className={classes.cell} style={{ borderBottom: 'none' }}>
-                          <Typography variant="body2">
-                            <Link component={RouterLink} to={`/position/${position.id}`}>
-                              {t('sharedShowDetails')}
-                            </Link>
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                    </TableFooter>
-                  </Table>
+                  {position.address && (
+                    <>
+                      <Typography className={classes.eyebrow}>
+                        {positionAttributes.address?.name || t('positionAddress')}
+                      </Typography>
+                      <Typography className={classes.address}>{position.address}</Typography>
+                    </>
+                  )}
+                  <div className={classes.kvGrid}>
+                    {positionItems
+                      .split(',')
+                      .filter(
+                        (key) =>
+                          key !== 'address' &&
+                          (position.hasOwnProperty(key) || position.attributes.hasOwnProperty(key)),
+                      )
+                      .map((key) => (
+                        <div key={key} className={classes.kvRow}>
+                          <span className={classes.kvLabel}>
+                            {positionAttributes[key]?.name || key}
+                          </span>
+                          <span className={classes.kvValue}>
+                            <PositionValue
+                              position={position}
+                              property={position.hasOwnProperty(key) ? key : null}
+                              attribute={position.hasOwnProperty(key) ? null : key}
+                            />
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                  <Link
+                    component={RouterLink}
+                    to={`/position/${position.id}`}
+                    className={classes.details}
+                    variant="body2"
+                  >
+                    {t('sharedShowDetails')}
+                  </Link>
                 </CardContent>
               )}
               <CardActions className={classes.actions} disableSpacing>
