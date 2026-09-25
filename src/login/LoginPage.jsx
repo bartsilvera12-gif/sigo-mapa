@@ -10,6 +10,7 @@ import {
   Snackbar,
   IconButton,
   Tooltip,
+  Typography,
 } from '@mui/material';
 import CountryFlag from 'react-country-flag';
 import { makeStyles } from 'tss-react/mui';
@@ -47,6 +48,18 @@ const useStyles = makeStyles()((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     gap: theme.spacing(2),
+  },
+  title: {
+    fontWeight: 700,
+    fontSize: '1.85rem',
+    lineHeight: 1.1,
+    letterSpacing: '-.02em',
+    color: theme.palette.text.primary,
+  },
+  subtitle: {
+    fontSize: '0.875rem',
+    color: theme.palette.text.secondary,
+    marginBottom: theme.spacing(1),
   },
   extraContainer: {
     display: 'flex',
@@ -202,6 +215,12 @@ const LoginPage = () => {
         {useMediaQuery(theme.breakpoints.down('lg')) && (
           <LogoImage color={theme.palette.primary.main} />
         )}
+        <div>
+          <Typography className={classes.title}>Iniciá sesión</Typography>
+          <Typography className={classes.subtitle}>
+            Entrá con tu cuenta para ver tu vehículo.
+          </Typography>
+        </div>
         {!openIdForced && (
           <>
             <TextField
