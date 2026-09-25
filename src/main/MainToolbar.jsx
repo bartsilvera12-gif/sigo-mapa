@@ -28,6 +28,7 @@ import TuneIcon from '@mui/icons-material/Tune';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useDeviceReadonly } from '../common/util/permissions';
 import DeviceRow from './DeviceRow';
+import AddDeviceDialog from './AddDeviceDialog';
 
 const useStyles = makeStyles()((theme) => ({
   toolbar: {
@@ -76,13 +77,17 @@ const MainToolbar = ({
   const deviceStatusCount = (status) =>
     Object.values(devices).filter((d) => d.status === status).length;
 
+  const [addDeviceOpen, setAddDeviceOpen] = useState(false);
+
   return (
+    <>
     <Toolbar ref={toolbarRef} className={classes.toolbar}>
       <IconButton edge="start" onClick={() => setDevicesOpen(!devicesOpen)}>
         {devicesOpen ? <MapIcon /> : <DnsIcon />}
       </IconButton>
       <OutlinedInput
         ref={inputRef}
+        sx={{ borderRadius: '999px' }}
         placeholder={t('sharedSearchDevices')}
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
@@ -212,7 +217,7 @@ const MainToolbar = ({
           </FormGroup>
         </div>
       </Popover>
-      <IconButton edge="end" onClick={() => navigate('/settings/device')} disabled={deviceReadonly}>
+      <IconButton edge="end" onClick={() => setAddDeviceOpen(true)} disabled={deviceReadonly} sx={{ bgcolor: 'primary.main', color: '#fff', '&:hover': { bgcolor: 'primary.dark' } }}>
         <Tooltip
           open={!deviceReadonly && devicesLoaded && Object.keys(devices).length === 0}
           title={t('deviceRegisterFirst')}
@@ -222,6 +227,8 @@ const MainToolbar = ({
         </Tooltip>
       </IconButton>
     </Toolbar>
+      <AddDeviceDialog open={addDeviceOpen} onClose={() => setAddDeviceOpen(false)} />
+    </>
   );
 };
 

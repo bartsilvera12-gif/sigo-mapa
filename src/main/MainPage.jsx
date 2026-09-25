@@ -124,7 +124,7 @@ const MainPage = () => {
         </Suspense>
       )}
       <div className={classes.sidebar}>
-        <Paper square elevation={3} className={classes.header}>
+        <Paper elevation={0} className={classes.header}>
           <MainToolbar
             filteredDevices={filteredDevices}
             devicesOpen={devicesOpen}
@@ -152,7 +152,7 @@ const MainPage = () => {
             </div>
           )}
           <Paper
-            square
+            elevation={0}
             className={classes.contentList}
             style={devicesOpen ? {} : { visibility: 'hidden' }}
           >
