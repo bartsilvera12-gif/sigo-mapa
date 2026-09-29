@@ -14,6 +14,7 @@ import useFilter from './useFilter';
 import MainToolbar from './MainToolbar';
 import DeviceDialog from './DeviceDialog';
 import CommandDialog from './CommandDialog';
+import ThemeToggle from './ThemeToggle';
 import { useAttributePreference } from '../common/util/preferences';
 
 const MainMap = lazy(() => import('./MainMap'));
@@ -169,6 +170,7 @@ const MainPage = () => {
           </div>
         )}
       </div>
+      {desktop && <ThemeToggle />}
       <EventsDrawer open={eventsOpen} onClose={() => setEventsOpen(false)} />
       {selectedDeviceId && (
         <StatusCard

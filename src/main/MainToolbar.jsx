@@ -25,11 +25,8 @@ import MapIcon from '@mui/icons-material/Map';
 import DnsIcon from '@mui/icons-material/Dns';
 import AddIcon from '@mui/icons-material/Add';
 import TuneIcon from '@mui/icons-material/Tune';
-import LightModeIcon from '@mui/icons-material/LightMode';
-import DarkModeIcon from '@mui/icons-material/DarkMode';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useDeviceReadonly } from '../common/util/permissions';
-import usePersistedState from '../common/util/usePersistedState';
 import DeviceRow from './DeviceRow';
 import DeviceDialog from './DeviceDialog';
 
@@ -135,8 +132,6 @@ const MainToolbar = ({
     Object.values(devices).filter((d) => d.status === status).length;
 
   const [addDeviceOpen, setAddDeviceOpen] = useState(false);
-  const [, setThemeMode] = usePersistedState('sigoThemeMode', 'auto');
-  const isDark = theme.palette.mode === 'dark';
 
   const deviceCount = Object.keys(devices).length;
 
@@ -174,11 +169,6 @@ const MainToolbar = ({
       <div className={classes.phead}>
         <span className={classes.pin} />
         <Typography className={classes.htitle}>{t('deviceTitle')}</Typography>
-        <Tooltip title={isDark ? 'Modo claro' : 'Modo oscuro'}>
-          <IconButton size="small" onClick={() => setThemeMode(isDark ? 'light' : 'dark')}>
-            {isDark ? <LightModeIcon /> : <DarkModeIcon />}
-          </IconButton>
-        </Tooltip>
         <Tooltip title={devicesOpen ? t('mapTitle') : t('deviceTitle')}>
           <IconButton size="small" onClick={() => setDevicesOpen(!devicesOpen)}>
             {devicesOpen ? <MapIcon /> : <DnsIcon />}
