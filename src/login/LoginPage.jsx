@@ -47,7 +47,28 @@ const useStyles = makeStyles()((theme) => ({
   container: {
     display: 'flex',
     flexDirection: 'column',
-    gap: theme.spacing(2),
+    gap: theme.spacing(2.5),
+    '& .MuiOutlinedInput-root': {
+      borderRadius: 12,
+    },
+    '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+      borderColor: '#161E2F',
+      borderWidth: 2,
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+      color: '#161E2F',
+    },
+  },
+  loginButton: {
+    height: 52,
+    borderRadius: 12,
+    fontWeight: 700,
+    fontSize: '0.95rem',
+    backgroundColor: '#161E2F',
+    color: '#FFFFFF',
+    '&:hover': {
+      backgroundColor: '#0C1220',
+    },
   },
   title: {
     fontWeight: 700,
@@ -259,7 +280,7 @@ const LoginPage = () => {
               onClick={handlePasswordLogin}
               type="submit"
               variant="contained"
-              color="secondary"
+              className={classes.loginButton}
               disabled={!email || !password || (codeEnabled && !code)}
             >
               {t('loginLogin')}
