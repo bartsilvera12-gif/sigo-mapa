@@ -2,7 +2,6 @@ import { useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
-  Toolbar,
   IconButton,
   OutlinedInput,
   InputAdornment,
@@ -18,6 +17,7 @@ import {
   ListItemButton,
   ListItemText,
   Tooltip,
+  Typography,
 } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 import { useTheme } from '@mui/material/styles';
@@ -31,9 +31,63 @@ import DeviceRow from './DeviceRow';
 import DeviceDialog from './DeviceDialog';
 
 const useStyles = makeStyles()((theme) => ({
-  toolbar: {
+  wrap: {
     display: 'flex',
+    flexDirection: 'column',
+  },
+  brandbar: {
+    display: 'flex',
+    alignItems: 'center',
     gap: theme.spacing(1),
+    padding: theme.spacing(1.5, 1.5, 1, 1.5),
+  },
+  phead: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(1),
+    padding: theme.spacing(0.5, 1.5, 1, 2),
+  },
+  pin: {
+    flex: 'none',
+    width: 13,
+    height: 13,
+    borderRadius: '50% 50% 50% 0',
+    transform: 'rotate(-45deg)',
+    backgroundColor: theme.palette.primary.main,
+    marginRight: theme.spacing(0.5),
+  },
+  htitle: {
+    flex: 1,
+    fontWeight: 700,
+    fontSize: '1.05rem',
+  },
+  addButton: {
+    backgroundColor: theme.palette.primary.main,
+    color: '#fff',
+    width: 38,
+    height: 38,
+    '&:hover': { backgroundColor: theme.palette.primary.dark },
+  },
+  grouprow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(1),
+    padding: theme.spacing(1, 1.5, 1, 2),
+    borderTop: `1px solid ${theme.palette.divider}`,
+    borderBottom: `1px solid ${theme.palette.divider}`,
+    backgroundColor: theme.palette.action.hover,
+  },
+  gname: {
+    fontWeight: 600,
+    fontSize: '0.8125rem',
+  },
+  count: {
+    fontWeight: 600,
+    fontSize: '0.72rem',
+    color: theme.palette.text.primary,
+    backgroundColor: theme.palette.action.selected,
+    borderRadius: 999,
+    padding: theme.spacing(0.25, 1),
   },
   filterPanel: {
     display: 'flex',
@@ -79,38 +133,66 @@ const MainToolbar = ({
 
   const [addDeviceOpen, setAddDeviceOpen] = useState(false);
 
+  const deviceCount = Object.keys(devices).length;
+
   return (
     <>
-    <Toolbar ref={toolbarRef} className={classes.toolbar}>
-      <IconButton edge="start" onClick={() => setDevicesOpen(!devicesOpen)}>
-        {devicesOpen ? <MapIcon /> : <DnsIcon />}
-      </IconButton>
-      <OutlinedInput
-        ref={inputRef}
-        sx={{ borderRadius: '999px' }}
-        placeholder={t('sharedSearchDevices')}
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-        onFocus={() => setDevicesAnchorEl(toolbarRef.current)}
-        onBlur={() => setDevicesAnchorEl(null)}
-        endAdornment={
-          <InputAdornment position="end">
-            <IconButton size="small" edge="end" onClick={() => setFilterAnchorEl(inputRef.current)}>
-              <Badge
-                color="info"
-                variant="dot"
-                invisible={
-                  !filter.statuses.length && !filter.groups.length && !filter.geofences.length
-                }
-              >
-                <TuneIcon fontSize="small" />
-              </Badge>
-            </IconButton>
-          </InputAdornment>
-        }
-        size="small"
-        fullWidth
-      />
+    <div ref={toolbarRef} className={classes.wrap}>
+      <div className={classes.brandbar}>
+        <OutlinedInput
+          ref={inputRef}
+          sx={{ borderRadius: '999px' }}
+          placeholder={t('sharedSearchDevices')}
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          onFocus={() => setDevicesAnchorEl(toolbarRef.current)}
+          onBlur={() => setDevicesAnchorEl(null)}
+          endAdornment={
+            <InputAdornment position="end">
+              <IconButton size="small" edge="end" onClick={() => setFilterAnchorEl(inputRef.current)}>
+                <Badge
+                  color="info"
+                  variant="dot"
+                  invisible={
+                    !filter.statuses.length && !filter.groups.length && !filter.geofences.length
+                  }
+                >
+                  <TuneIcon fontSize="small" />
+                </Badge>
+              </IconButton>
+            </InputAdornment>
+          }
+          size="small"
+          fullWidth
+        />
+      </div>
+      <div className={classes.phead}>
+        <span className={classes.pin} />
+        <Typography className={classes.htitle}>{t('deviceTitle')}</Typography>
+        <Tooltip title={devicesOpen ? t('mapTitle') : t('deviceTitle')}>
+          <IconButton size="small" onClick={() => setDevicesOpen(!devicesOpen)}>
+            {devicesOpen ? <MapIcon /> : <DnsIcon />}
+          </IconButton>
+        </Tooltip>
+        <Tooltip
+          open={!deviceReadonly && devicesLoaded && deviceCount === 0}
+          title={t('deviceRegisterFirst')}
+          arrow
+        >
+          <IconButton
+            className={classes.addButton}
+            onClick={() => setAddDeviceOpen(true)}
+            disabled={deviceReadonly}
+          >
+            <AddIcon />
+          </IconButton>
+        </Tooltip>
+      </div>
+      <div className={classes.grouprow}>
+        <Typography className={classes.gname}>{t('groupNoGroup')}</Typography>
+        <span style={{ flex: 1 }} />
+        <span className={classes.count}>{deviceCount.toLocaleString('es')}</span>
+      </div>
       <Popover
         open={!!devicesAnchorEl && !devicesOpen}
         anchorEl={devicesAnchorEl}
@@ -217,16 +299,7 @@ const MainToolbar = ({
           </FormGroup>
         </div>
       </Popover>
-      <IconButton edge="end" onClick={() => setAddDeviceOpen(true)} disabled={deviceReadonly} sx={{ bgcolor: 'primary.main', color: '#fff', '&:hover': { bgcolor: 'primary.dark' } }}>
-        <Tooltip
-          open={!deviceReadonly && devicesLoaded && Object.keys(devices).length === 0}
-          title={t('deviceRegisterFirst')}
-          arrow
-        >
-          <AddIcon />
-        </Tooltip>
-      </IconButton>
-    </Toolbar>
+    </div>
       <DeviceDialog open={addDeviceOpen} onClose={() => setAddDeviceOpen(false)} />
     </>
   );

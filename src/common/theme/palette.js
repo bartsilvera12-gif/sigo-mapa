@@ -21,7 +21,9 @@ export default (server, darkMode) => ({
 
   primary: {
 
-    main: validatedColor(server?.attributes?.colorPrimary) || '#B51A2B',
+    // Rojo SIGO forzado (ignora el color primario configurado en el servidor)
+
+    main: '#B51A2B',
 
   },
 
