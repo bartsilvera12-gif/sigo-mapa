@@ -26,7 +26,7 @@ const useStyles = makeStyles()((theme) => ({
     position: 'relative',
     display: 'grid',
     placeItems: 'center',
-    width: 'min(420px, 80%)',
+    width: 'min(560px, 92%)',
     marginTop: theme.spacing(-4),
   },
   video: {
