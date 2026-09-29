@@ -13,6 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import CountryFlag from 'react-country-flag';
+import { motion } from 'framer-motion';
 import { makeStyles } from 'tss-react/mui';
 import CloseIcon from '@mui/icons-material/Close';
 import VpnLockIcon from '@mui/icons-material/VpnLock';
@@ -34,6 +35,23 @@ import LogoImage from './LogoImage';
 import { useCatch } from '../reactHelper';
 import QrCodeDialog from '../common/components/QrCodeDialog';
 import PasswordField from '../common/components/PasswordField';
+
+// Animación de entrada escalonada (fade + subida) para el formulario
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: { y: 0, opacity: 1 },
+};
+
+const Item = ({ children }) => (
+  <motion.div variants={itemVariants} style={{ width: '100%' }}>
+    {children}
+  </motion.div>
+);
 
 const useStyles = makeStyles()((theme) => ({
   options: {
@@ -232,91 +250,119 @@ const LoginPage = () => {
           </FormControl>
         )}
       </div>
-      <div className={classes.container}>
+      <motion.div
+        className={classes.container}
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         {useMediaQuery(theme.breakpoints.down('lg')) && (
-          <LogoImage color={theme.palette.primary.main} />
+          <Item>
+            <LogoImage color={theme.palette.primary.main} />
+          </Item>
         )}
-        <div>
+        <Item>
           <Typography className={classes.title}>Iniciá sesión</Typography>
           <Typography className={classes.subtitle}>
             Entrá con tu cuenta para ver tu vehículo.
           </Typography>
-        </div>
+        </Item>
         {!openIdForced && (
           <>
-            <TextField
-              required
-              error={failed}
-              label={t('userEmail')}
-              name="email"
-              value={email}
-              autoComplete="email"
-              autoFocus={!email}
-              onChange={(e) => setEmail(e.target.value)}
-              helperText={failed && 'Invalid username or password'}
-            />
-            <PasswordField
-              required
-              error={failed}
-              label={t('userPassword')}
-              name="password"
-              value={password}
-              autoComplete="current-password"
-              autoFocus={!!email}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            {codeEnabled && (
+            <Item>
               <TextField
                 required
+                fullWidth
                 error={failed}
-                label={t('loginTotpCode')}
-                name="code"
-                value={code}
-                type="number"
-                onChange={(e) => setCode(e.target.value)}
+                label={t('userEmail')}
+                name="email"
+                value={email}
+                autoComplete="email"
+                autoFocus={!email}
+                onChange={(e) => setEmail(e.target.value)}
+                helperText={failed && 'Invalid username or password'}
               />
+            </Item>
+            <Item>
+              <PasswordField
+                required
+                fullWidth
+                error={failed}
+                label={t('userPassword')}
+                name="password"
+                value={password}
+                autoComplete="current-password"
+                autoFocus={!!email}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Item>
+            {codeEnabled && (
+              <Item>
+                <TextField
+                  required
+                  fullWidth
+                  error={failed}
+                  label={t('loginTotpCode')}
+                  name="code"
+                  value={code}
+                  type="number"
+                  onChange={(e) => setCode(e.target.value)}
+                />
+              </Item>
             )}
-            <Button
-              onClick={handlePasswordLogin}
-              type="submit"
-              variant="contained"
-              className={classes.loginButton}
-              disabled={!email || !password || (codeEnabled && !code)}
-            >
-              {t('loginLogin')}
-            </Button>
+            <Item>
+              <Button
+                onClick={handlePasswordLogin}
+                type="submit"
+                variant="contained"
+                fullWidth
+                className={classes.loginButton}
+                disabled={!email || !password || (codeEnabled && !code)}
+              >
+                {t('loginLogin')}
+              </Button>
+            </Item>
           </>
         )}
         {openIdEnabled && (
-          <Button onClick={() => handleOpenIdLogin()} variant="contained" color="secondary">
-            {t('loginOpenId')}
-          </Button>
+          <Item>
+            <Button
+              onClick={() => handleOpenIdLogin()}
+              variant="contained"
+              fullWidth
+              color="secondary"
+            >
+              {t('loginOpenId')}
+            </Button>
+          </Item>
         )}
         {!openIdForced && (
-          <div className={classes.extraContainer}>
-            {registrationEnabled && (
-              <Link
-                onClick={() => navigate('/register')}
-                className={classes.link}
-                underline="none"
-                variant="caption"
-              >
-                {t('loginRegister')}
-              </Link>
-            )}
-            {emailEnabled && (
-              <Link
-                onClick={() => navigate('/reset-password')}
-                className={classes.link}
-                underline="none"
-                variant="caption"
-              >
-                {t('loginReset')}
-              </Link>
-            )}
-          </div>
+          <Item>
+            <div className={classes.extraContainer}>
+              {registrationEnabled && (
+                <Link
+                  onClick={() => navigate('/register')}
+                  className={classes.link}
+                  underline="none"
+                  variant="caption"
+                >
+                  {t('loginRegister')}
+                </Link>
+              )}
+              {emailEnabled && (
+                <Link
+                  onClick={() => navigate('/reset-password')}
+                  className={classes.link}
+                  underline="none"
+                  variant="caption"
+                >
+                  {t('loginReset')}
+                </Link>
+              )}
+            </div>
+          </Item>
         )}
-      </div>
+      </motion.div>
       <QrCodeDialog open={showQr} onClose={() => setShowQr(false)} />
       <Snackbar
         open={!!announcement && !announcementShown}

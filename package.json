@@ -22,6 +22,7 @@
     "dayjs": "^1.11.23",
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
+    "framer-motion": "^13.4.6",
     "gcoord": "^1.0.7",
     "hls.js": "^1.7.3",
     "maplibre-gl": "^6.10.0",
