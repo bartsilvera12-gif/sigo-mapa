@@ -188,11 +188,6 @@ const MainToolbar = ({
           </IconButton>
         </Tooltip>
       </div>
-      <div className={classes.grouprow}>
-        <Typography className={classes.gname}>{t('groupNoGroup')}</Typography>
-        <span style={{ flex: 1 }} />
-        <span className={classes.count}>{deviceCount.toLocaleString('es')}</span>
-      </div>
       <Popover
         open={!!devicesAnchorEl && !devicesOpen}
         anchorEl={devicesAnchorEl}

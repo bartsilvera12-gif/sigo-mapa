@@ -150,20 +150,31 @@ const MapView = ({ children }) => {
     <div style={{ width: '100%', height: '100%' }} ref={containerRef}>
       <GlobalStyles
         styles={{
-          // Controles del mapa (MapLibre) con estilo SIGO: bordes redondeados y sombra.
-          // Se mantiene el fondo por defecto para que los iconos sigan visibles en ambos modos.
+          // Controles del mapa (MapLibre) con estilo SIGO: fondo del tema,
+          // bordes redondeados, sombra y separadores entre botones.
           '.maplibregl-ctrl-group': {
+            background: `${theme.palette.background.paper} !important`,
+            border: `1px solid ${theme.palette.divider}`,
             borderRadius: '11px !important',
             overflow: 'hidden',
             boxShadow: '0 8px 22px rgba(12,18,32,.28) !important',
           },
           '.maplibregl-ctrl-group button': {
-            width: '38px',
-            height: '38px',
+            width: '40px',
+            height: '40px',
+            background: 'transparent !important',
+          },
+          '.maplibregl-ctrl-group button + button': {
+            borderTop: `1px solid ${theme.palette.divider} !important`,
           },
           '.maplibregl-ctrl button:not(:disabled):hover': {
-            backgroundColor: `${theme.palette.primary.main}14 !important`,
+            backgroundColor: `${theme.palette.action.hover} !important`,
           },
+          // En modo oscuro, los iconos de MapLibre son oscuros: se invierten
+          // para que se vean sobre el fondo oscuro del control.
+          ...(theme.palette.mode === 'dark'
+            ? { '.maplibregl-ctrl-group button .maplibregl-ctrl-icon': { filter: 'invert(1)' } }
+            : {}),
         }}
       />
       <MapSwitcher styles={styles} selectedId={selectedStyleId} onSelect={setSelectedStyleId} />
