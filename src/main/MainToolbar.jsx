@@ -49,12 +49,20 @@ const useStyles = makeStyles()((theme) => ({
   },
   pin: {
     flex: 'none',
-    width: 13,
-    height: 13,
+    position: 'relative',
+    width: 14,
+    height: 14,
     borderRadius: '50% 50% 50% 0',
     transform: 'rotate(-45deg)',
     backgroundColor: theme.palette.primary.main,
-    marginRight: theme.spacing(0.5),
+    marginRight: theme.spacing(0.75),
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      inset: 4,
+      borderRadius: '50%',
+      backgroundColor: theme.palette.background.paper,
+    },
   },
   htitle: {
     flex: 1,
