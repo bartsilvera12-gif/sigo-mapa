@@ -170,10 +170,14 @@ const MapView = ({ children }) => {
           '.maplibregl-ctrl button:not(:disabled):hover': {
             backgroundColor: `${theme.palette.action.hover} !important`,
           },
-          // En modo oscuro, los iconos de MapLibre son oscuros: se invierten
-          // para que se vean sobre el fondo oscuro del control.
+          // En modo oscuro, los iconos de MapLibre son oscuros: se fuerzan a
+          // blanco puro (brightness(0) invert(1)) para que se vean nítidos.
           ...(theme.palette.mode === 'dark'
-            ? { '.maplibregl-ctrl-group button .maplibregl-ctrl-icon': { filter: 'invert(1)' } }
+            ? {
+              '.maplibregl-ctrl-group button .maplibregl-ctrl-icon': {
+                filter: 'brightness(0) invert(1)',
+              },
+            }
             : {}),
         }}
       />
